@@ -522,23 +522,40 @@ function enviarPedido(){
   btn.disabled=true;
   btn.innerHTML='<span class="spinner"></span>Enviando…';
 
-  // Envia para o Apps Script (no-cors para evitar bloqueio do navegador)
-  fetch(API_URL,{
-    method:'POST',
-    mode:'no-cors',
-    headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify(payload)
-  })
-  .then(function(){
-    // Com no-cors não conseguimos ler a resposta, mas se chegou aqui foi enviado
+  // Envia via iframe oculto -- bypass total de CORS
+  var iframe=document.getElementById('hidden-iframe');
+  if(!iframe){
+    iframe=document.createElement('iframe');
+    iframe.id='hidden-iframe';
+    iframe.name='hidden-iframe';
+    iframe.style.display='none';
+    document.body.appendChild(iframe);
+  }
+  var frm=document.getElementById('hidden-form');
+  if(!frm){
+    frm=document.createElement('form');
+    frm.id='hidden-form';
+    frm.method='POST';
+    frm.target='hidden-iframe';
+    frm.style.display='none';
+    document.body.appendChild(frm);
+  }
+  frm.action=API_URL;
+  frm.innerHTML='';
+  var inp=document.createElement('input');
+  inp.type='hidden'; inp.name='dados'; inp.value=JSON.stringify(payload);
+  frm.appendChild(inp);
+
+  function mostrarSucesso(){
+    if(document.getElementById('form-area').style.display==='none') return;
     document.getElementById('form-area').style.display='none';
     document.getElementById('success').style.display='block';
     window.scrollTo({top:0,behavior:'smooth'});
-  })
-  .catch(function(){
-    toast('❌ Erro de conexão. Verifique sua internet e tente novamente.');
-    btn.disabled=false; btn.innerHTML='✅ Enviar Pedido';
-  });
+  }
+
+  iframe.onload=mostrarSucesso;
+  setTimeout(mostrarSucesso, 3500);
+  frm.submit();
 }
 
 // ── TABS ──────────────────────────────────────────────────────
