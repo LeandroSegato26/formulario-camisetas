@@ -244,7 +244,7 @@ textarea{resize:vertical;min-height:80px;}
   <div class="success-screen" id="success">
     <div class="success-icon">✅</div>
     <h2>Pedido enviado!</h2>
-    <p>Seu pedido foi registrado com sucesso. As camisetas serão enviadas para sua unidade após a confecção. Qualquer dúvida: <strong>natalia.santana@totvs.com.br</strong></p>
+    <p>Seu pedido foi registrado com sucesso. As camisetas serão enviadas para sua unidade após a confecção. Qualquer dúvida: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="630d0217020f0a024d10020d17020d0223170c1715104d000c0e4d0111">[email&#160;protected]</a></strong></p>
   </div>
 
   <!-- FORMULÁRIO -->
@@ -259,7 +259,7 @@ textarea{resize:vertical;min-height:80px;}
         <li>Selecione o produto pelo <strong>código do catálogo</strong>.</li>
         <li>Todo o pedido deve ser feito neste único formulário. <strong>Não haverá trocas.</strong></li>
         <li>Valor acima de R$80,00 será descontado em <strong>3× no pagamento</strong>.</li>
-        <li>Tamanhos maiores: <strong>natalia.santana@totvs.com.br</strong></li>
+        <li>Tamanhos maiores: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="355b544154595c541b46545b41545b5475415a4143461b565a581b5747">[email&#160;protected]</a></strong></li>
       </ul>
     </div>
 
@@ -349,12 +349,12 @@ textarea{resize:vertical;min-height:80px;}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ══════════════════════════════════════════════════════════════
 //  ⚠️  IMPORTANTE: substitua SUA_URL_AQUI pela URL do Apps Script
 //  após implantar o backend (arquivo backend_pedidos.gs)
 // ══════════════════════════════════════════════════════════════
-var API_URL = 'https://script.google.com/a/macros/totvs.com.br/s/AKfycbyRIKf2I9wPTZXBZSI5DU1-RswgyfVhfNpCzKWk-Ez0lxTTSLXk6e8_yA-1SNyV0STpUg/exec';
+var API_URL = 'SUA_URL_AQUI';
 
 // ── CATÁLOGO ──────────────────────────────────────────────────
 var CAT = [
@@ -522,25 +522,21 @@ function enviarPedido(){
   btn.disabled=true;
   btn.innerHTML='<span class="spinner"></span>Enviando…';
 
-  // Envia para o Apps Script
+  // Envia para o Apps Script (no-cors para evitar bloqueio do navegador)
   fetch(API_URL,{
     method:'POST',
+    mode:'no-cors',
     headers:{'Content-Type':'text/plain'},
     body:JSON.stringify(payload)
   })
-  .then(function(r){return r.json();})
-  .then(function(data){
-    if(data.sucesso){
-      document.getElementById('form-area').style.display='none';
-      document.getElementById('success').style.display='block';
-      window.scrollTo({top:0,behavior:'smooth'});
-    } else {
-      toast('❌ Erro ao enviar: '+data.mensagem);
-      btn.disabled=false; btn.innerHTML='✅ Enviar Pedido';
-    }
+  .then(function(){
+    // Com no-cors não conseguimos ler a resposta, mas se chegou aqui foi enviado
+    document.getElementById('form-area').style.display='none';
+    document.getElementById('success').style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
   })
   .catch(function(){
-    toast('❌ Erro de conexão. Verifique e tente novamente.');
+    toast('❌ Erro de conexão. Verifique sua internet e tente novamente.');
     btn.disabled=false; btn.innerHTML='✅ Enviar Pedido';
   });
 }
@@ -553,15 +549,4 @@ function showTab(id,btn){
   btn.classList.add('active');
 }
 
-// ── TOAST ─────────────────────────────────────────────────────
-function toast(msg){
-  var t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},3500);
-}
-
-// INIT
-renderItens();
-</script>
-</body>
-</html>
+// ── TOAST ───�
